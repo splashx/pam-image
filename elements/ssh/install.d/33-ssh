@@ -1,0 +1,96 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -ue
+set -o pipefail
+echo "Begin: install and configure SSH"
+
+augtool <<EOF
+set /files/etc/ssh/sshd_config/UsePAM yes
+
+set /files/etc/ssh/sshd_config/ChallengeResponseAuthentication no
+set /files/etc/ssh/sshd_config/AllowAgentForwarding no
+set /files/etc/ssh/sshd_config/X11Forwarding no
+set /files/etc/ssh/sshd_config/PermitRootLogin no
+set /files/etc/ssh/sshd_config/PubkeyAuthentication no
+set /files/etc/ssh/sshd_config/RhostsRSAAuthentication no
+set /files/etc/ssh/sshd_config/HostbasedAuthentication no
+set /files/etc/ssh/sshd_config/PermitEmptyPasswords no
+set /files/etc/ssh/sshd_config/PasswordAuthentication no
+set /files/etc/ssh/sshd_config/X11Forwarding no
+set /files/etc/ssh/sshd_config/PrintMotd no
+set /files/etc/ssh/sshd_config/PrintLastLog no
+set /files/etc/ssh/sshd_config/UseDNS no
+
+set /files/etc/ssh/sshd_config/GSSAPIAuthentication yes
+set /files/etc/ssh/sshd_config/UsePrivilegeSeparation yes
+
+set /files/etc/ssh/sshd_config/KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+set /files/etc/ssh/sshd_config/Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+set /files/etc/ssh/sshd_config/MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
+
+set /files/etc/ssh/sshd_config/Port 22
+set /files/etc/ssh/sshd_config/Protocol 2
+set /files/etc/ssh/sshd_config/HostKey /etc/ssh/ssh_host_ed25519_key
+set /files/etc/ssh/sshd_config/HostKey /etc/ssh/ssh_host_rsa_key
+
+set /files/etc/ssh/sshd_config/KeyRegenerationInterval 3600
+set /files/etc/ssh/sshd_config/ServerKeyBits 1024
+
+set /files/etc/ssh/sshd_config/SyslogFacility AUTH
+set /files/etc/ssh/sshd_config/LogLevel INFO
+
+set /files/etc/ssh/sshd_config/LoginGraceTime 120
+set /files/etc/ssh/sshd_config/StrictModes yes
+
+set /files/etc/ssh/sshd_config/IgnoreRhosts yes
+
+set /files/etc/ssh/sshd_config/X11DisplayOffset 10
+set /files/etc/ssh/sshd_config/TCPKeepAlive yes
+
+set /files/etc/ssh/sshd_config/AcceptEnv LANG LC_*
+
+save
+EOF
+
+# ripped from https://github.com/openstack/sahara-image-elements/tree/master/elements
+# let it here in case pAM will be built on another linux distro..
+case "$DISTRO_NAME" in
+    ubuntu )
+        augtool <<EOF
+set /files/etc/ssh/sshd_config/GSSAPICleanupCredentials yes
+set /files/etc/ssh/sshd_config/AuthorizedKeysFile %h/.ssh/authorized_keys
+save
+EOF
+     ;;
+#     fedora )
+#         sed -i 's/ssh_pwauth:    0/ssh_pwauth:    1/' /etc/cloud/cloud.cfg
+#         augtool <<EOF
+# clear /files/etc/sudoers/Defaults[type=':nrpe']/requiretty/negate
+# set /files/etc/ssh/sshd_config/SyslogFacility AUTH
+# set /files/etc/ssh/sshd_config/StrictModes yes
+# set /files/etc/ssh/sshd_config/RSAAuthentication yes
+# set /files/etc/ssh/sshd_config/PubkeyAuthentication yes
+# save
+# EOF
+#     ;;
+#     rhel | centos | centos7 )
+#         sed -i 's/ssh_pwauth:    0/ssh_pwauth:    1/' /etc/cloud/cloud.cfg
+#         augtool <<EOF
+# clear /files/etc/sudoers/Defaults[type=':nrpe']/requiretty/negate
+# set /files/etc/ssh/sshd_config/SyslogFacility AUTH
+# set /files/etc/ssh/sshd_config/PubkeyAuthentication yes
+# save
+# EOF
+    ;;
+    * )
+        echo "Unknown distro: $DISTRO_NAME, exiting"
+        exit 1
+    ;;
+esac
+
+echo "End: install and configure SSH"
+
+:
