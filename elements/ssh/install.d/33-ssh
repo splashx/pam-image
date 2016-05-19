@@ -5,7 +5,7 @@ if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
 fi
 set -ue
 set -o pipefail
-echo "Begin: install and configure SSH"
+echo "Begin: install and configure SSH: "
 
 augtool <<EOF
 set /files/etc/ssh/sshd_config/UsePAM yes
@@ -48,8 +48,8 @@ set /files/etc/ssh/sshd_config/MACs/8 umac-128@openssh.com
 
 set /files/etc/ssh/sshd_config/Port 22
 set /files/etc/ssh/sshd_config/Protocol 2
-set /files/etc/ssh/sshd_config/HostKey /etc/ssh/ssh_host_ed25519_key
-set /files/etc/ssh/sshd_config/HostKey /etc/ssh/ssh_host_rsa_key
+set /files/etc/ssh/sshd_config/HostKey[1] /etc/ssh/ssh_host_ed25519_key
+set /files/etc/ssh/sshd_config/HostKey[2] /etc/ssh/ssh_host_rsa_key
 
 set /files/etc/ssh/sshd_config/KeyRegenerationInterval 3600
 set /files/etc/ssh/sshd_config/ServerKeyBits 1024
