@@ -23,10 +23,10 @@ Steps how to create cloud image with OpenSSH acting as a Privilege Account Manan
 
 1. Copy elements/ directory to disk-image-builder/elements/
   ```bash
-      cp -R elements/* ../diskimage-builder/elements/
+  cp -R elements/* ../diskimage-builder/elements/
   ```
 
 1. Call the following command to create cloud image is able to run on OpenStack:
   ```bash
-       disk-image-create base vm ssh sss ubuntu selinux-permissive root-passwd -o ubuntu_pam
+  disk-image-create base vm ssh sss ubuntu selinux-permissive root-passwd -o ubuntu_pam
   ```
