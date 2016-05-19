@@ -65,8 +65,6 @@ set /files/etc/ssh/sshd_config/IgnoreRhosts yes
 set /files/etc/ssh/sshd_config/X11DisplayOffset 10
 set /files/etc/ssh/sshd_config/TCPKeepAlive yes
 
-set /files/etc/ssh/sshd_config/AcceptEnv LANG LC_*
-
 save
 EOF
 
