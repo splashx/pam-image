@@ -23,5 +23,5 @@ Steps how to create cloud image with OpenSSH acting as a Privilege Account Manan
 1.1. Ubuntu cloud image
 
 ```bash
-     disk-image-create base vm ssh sssd ubuntu selinux-permissive root-passwd -o ubuntu_pam
+     disk-image-create base vm ssh sss ubuntu selinux-permissive root-passwd -o ubuntu_pam
 ```
